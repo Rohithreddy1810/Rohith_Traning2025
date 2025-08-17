@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+	tools {
+                maven 'M3911'
+                jdk 'Java_Home'
+            }
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                git changelog: false, poll: false, url: 'https://github.com/mohansgithub/ci-vprofile-sample.git'
+            }
+        }
+		stage('Build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+		stage('Deployment') {
+            steps {
+                deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: '3017c034-d7e8-4357-92b9-12acb22e82e1', path: '', url: 'http://localhost:8082/')], contextPath: '/ViProfilePipeline', war: '**/*.war'
+            }
+        }
+    }
+}
